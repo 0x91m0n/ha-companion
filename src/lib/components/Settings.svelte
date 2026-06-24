@@ -9,6 +9,7 @@
   import { t, locale } from "../i18n";
   import {
     CONTROLLABLE_DOMAINS,
+    READONLY_DOMAINS,
     iconForDomain,
     defaultService,
     EMOJI_PALETTE,
@@ -38,7 +39,8 @@
   let animations = initial.theme.animations;
   let panelSize: PanelSize = initial.theme.panelSize;
   let backdrop: Backdrop = initial.theme.backdrop;
-  $: theme = { accent, opacity, mode, radius, columns, animations, panelSize, backdrop };
+  let performance = initial.theme.performance;
+  $: theme = { accent, opacity, mode, radius, columns, animations, panelSize, backdrop, performance };
   $: applyTheme(theme);
   $: locale.set(lang);
 
@@ -110,6 +112,12 @@
   }
   function setCardColor(i: number, color: string | undefined) {
     cards = cards.map((c, idx) => (idx === i ? { ...c, color } : c));
+  }
+  function setCardSize(i: number, size: "s" | "l") {
+    cards = cards.map((c, idx) => (idx === i ? { ...c, size } : c));
+  }
+  function effSize(c: EntityCard): "s" | "l" {
+    return c.size ?? (READONLY_DOMAINS.has(c.entity_id.split(".")[0]) ? "s" : "l");
   }
   function openIconEditor(id: string) {
     editingIcon = editingIcon === id ? null : id;
@@ -300,6 +308,13 @@
                       </label>
                       {#if card.color}<button class="pc-reset" on:click={() => setCardColor(i, undefined)}>{$t("reset")}</button>{/if}
                     </div>
+                    <div class="pop-color">
+                      <span class="pc-lbl">{$t("ent.tileSize")}</span>
+                      <div class="seg seg-sm">
+                        <button class:active={effSize(card) === "s"} on:click={() => setCardSize(i, "s")}>{$t("size.small")}</button>
+                        <button class:active={effSize(card) === "l"} on:click={() => setCardSize(i, "l")}>{$t("size.large")}</button>
+                      </div>
+                    </div>
                   </div>
                 {/if}
               </div>
@@ -398,6 +413,13 @@
           <input type="checkbox" bind:checked={animations} />
           <span class="switch"></span>
         </label>
+
+        <label class="switch-row">
+          <span>{$t("appr.performance")}</span>
+          <input type="checkbox" bind:checked={performance} />
+          <span class="switch"></span>
+        </label>
+        <p class="sub-hint">{$t("appr.performanceHint")}</p>
 
         <label class="switch-row">
           <span>{$t("appr.autostart")}</span>
@@ -844,6 +866,10 @@
     color: var(--text);
     font-size: 11px;
     cursor: pointer;
+  }
+  .seg-sm button {
+    padding: 5px 11px;
+    font-size: 11px;
   }
   .picker {
     background: var(--input-bg);

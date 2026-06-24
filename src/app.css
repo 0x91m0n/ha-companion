@@ -17,6 +17,7 @@
   --input-bg: #0c0e15;
   --panel-g1: rgba(34, 37, 50, var(--bg-opacity));
   --panel-g2: rgba(18, 20, 28, calc(var(--bg-opacity) + 0.08));
+  --solid-bg: #15171f;
 }
 
 html.theme-light {
@@ -30,6 +31,7 @@ html.theme-light {
   --input-bg: #ffffff;
   --panel-g1: rgba(255, 255, 255, var(--bg-opacity));
   --panel-g2: rgba(230, 235, 244, calc(var(--bg-opacity) + 0.08));
+  --solid-bg: #f4f6fa;
 }
 
 html,
@@ -66,6 +68,11 @@ html.ctx-window #app {
 .no-anim *::after {
   transition: none !important;
   animation: none !important;
+}
+
+/* Solid (no-blur) / performance mode: opaque panel surface */
+html.backdrop-solid .panel-shell {
+  background: var(--solid-bg) !important;
 }
 
 ::-webkit-scrollbar {

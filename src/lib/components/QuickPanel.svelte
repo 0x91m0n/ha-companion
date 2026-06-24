@@ -2,6 +2,7 @@
   import { config, connStatus, lastError } from "../store";
   import { t } from "../i18n";
   import { turnOffAllLights } from "../haClient";
+  import { READONLY_DOMAINS } from "../icons";
   import EntityTile from "./EntityTile.svelte";
   import AddTile from "./AddTile.svelte";
   import { openSettings, openFullHA } from "../windows";
@@ -13,6 +14,15 @@
     error: "status.error",
     disconnected: "status.disconnected",
   };
+
+  function tileSize(c: { entity_id: string; size?: "s" | "l" }): "s" | "l" {
+    return c.size ?? (READONLY_DOMAINS.has(c.entity_id.split(".")[0]) ? "s" : "l");
+  }
+  $: cols = $config.theme.columns;
+  function span(c: { entity_id: string; size?: "s" | "l" }): number {
+    if (cols < 2) return 1;
+    return tileSize(c) === "l" ? 2 : 1;
+  }
 
   let pinned = false;
   function togglePin() {
@@ -63,7 +73,9 @@
     {:else}
       <div class="grid" style="--gtc: repeat(var(--cols, 1), 1fr)">
         {#each $config.cards as card (card.entity_id)}
-          <EntityTile {card} />
+          <div class="cell" style="grid-column: span {span(card)}">
+            <EntityTile {card} compact={cols >= 2 && span(card) === 1} />
+          </div>
         {/each}
       </div>
     {/if}
@@ -177,6 +189,9 @@
     grid-template-columns: var(--gtc);
     gap: 12px;
     align-content: start;
+  }
+  .cell {
+    min-width: 0;
   }
   .empty {
     height: 100%;

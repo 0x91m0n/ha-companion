@@ -50,6 +50,9 @@ const en: Dict = {
   "ent.uploadBtn": "⬆️ Choose PNG / SVG",
   "ent.uploadHint": "Image is scaled to 64×64.",
   "ent.tileColor": "Tile color",
+  "ent.tileSize": "Tile size",
+  "size.small": "Small",
+  "size.large": "Large",
   "reset": "Reset",
   "panel.pin": "Pin (keep open)",
   "panel.unpin": "Unpin",
@@ -71,6 +74,8 @@ const en: Dict = {
   "appr.language": "Language",
   "appr.autostart": "Launch at Windows startup",
   "appr.autostartHint": "Works for the installed app (.exe).",
+  "appr.performance": "Performance mode",
+  "appr.performanceHint": "Turns off blur and animations for a lighter, faster panel.",
 };
 
 const ru: Dict = {
@@ -118,6 +123,9 @@ const ru: Dict = {
   "ent.uploadBtn": "⬆️ Выбрать PNG / SVG",
   "ent.uploadHint": "Изображение масштабируется до 64×64.",
   "ent.tileColor": "Цвет плитки",
+  "ent.tileSize": "Размер плитки",
+  "size.small": "Маленькая",
+  "size.large": "Большая",
   "reset": "Сброс",
   "panel.pin": "Закрепить (не скрывать)",
   "panel.unpin": "Открепить",
@@ -139,6 +147,8 @@ const ru: Dict = {
   "appr.language": "Язык",
   "appr.autostart": "Запуск при старте Windows",
   "appr.autostartHint": "Работает для установленного приложения (.exe).",
+  "appr.performance": "Режим производительности",
+  "appr.performanceHint": "Отключает размытие и анимации — панель легче и быстрее.",
 };
 
 const dict: Record<Lang, Dict> = { en, ru };

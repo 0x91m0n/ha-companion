@@ -6,12 +6,33 @@ import {
   type Connection,
   type HassEntities,
 } from "home-assistant-js-websocket";
-import { entities, connStatus, lastError } from "./store";
+import { entities, connStatus, lastError, STATES_KEY } from "./store";
 import type { EntityCard } from "./store";
-import { defaultService } from "./icons";
+import { defaultService, READONLY_DOMAINS } from "./icons";
 
 let connection: Connection | null = null;
 let unsub: (() => void) | null = null;
+
+// Last known good states (for read-only sensors) so they survive HA hiccups
+// and app restarts instead of showing "unavailable".
+let goodCache: Record<string, any> = {};
+try {
+  const raw = localStorage.getItem(STATES_KEY);
+  if (raw) goodCache = JSON.parse(raw);
+} catch {}
+let persistTimer: ReturnType<typeof setTimeout> | undefined;
+function persistStates() {
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    try {
+      const out: Record<string, any> = {};
+      for (const id in goodCache) {
+        if (READONLY_DOMAINS.has(id.split(".")[0])) out[id] = goodCache[id];
+      }
+      localStorage.setItem(STATES_KEY, JSON.stringify(out));
+    } catch {}
+  }, 2000);
+}
 
 function errText(e: any): string {
   const map: Record<number, string> = {
@@ -43,7 +64,22 @@ export async function connectHA(hassUrl: string, token: string): Promise<void> {
     connection = await createConnection({ auth });
     connection.addEventListener("ready", () => connStatus.set("connected"));
     connection.addEventListener("disconnected", () => connStatus.set("connecting"));
-    unsub = subscribeEntities(connection, (e: HassEntities) => entities.set(e));
+    unsub = subscribeEntities(connection, (ents: HassEntities) => {
+      const merged: Record<string, any> = {};
+      for (const id in ents) {
+        const e = (ents as any)[id];
+        const bad = e.state === "unavailable" || e.state === "unknown";
+        const readonly = READONLY_DOMAINS.has(id.split(".")[0]);
+        if (readonly && bad && goodCache[id]) {
+          merged[id] = goodCache[id]; // keep last reading
+        } else {
+          merged[id] = e;
+          if (!bad) goodCache[id] = e;
+        }
+      }
+      entities.set(merged);
+      persistStates();
+    });
     connStatus.set("connected");
   } catch (e) {
     console.error("HA connection failed", e);

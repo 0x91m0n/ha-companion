@@ -4,7 +4,7 @@
   import { config, loadConfig, PANEL_SIZES } from "./lib/store";
   import type { AppConfig } from "./lib/store";
   import { connectHA } from "./lib/haClient";
-  import { applyTheme } from "./lib/theme";
+  import { applyTheme, effectiveBackdrop } from "./lib/theme";
   import { locale } from "./lib/i18n";
   import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
   import { listen } from "@tauri-apps/api/event";
@@ -27,7 +27,7 @@
     if (isSettings) return;
     try {
       await invoke("apply_backdrop", {
-        kind: c.theme.backdrop,
+        kind: effectiveBackdrop(c.theme),
         dark: c.theme.mode === "dark",
         alpha: Math.round(Math.min(1, Math.max(0, c.theme.opacity)) * 255),
       });

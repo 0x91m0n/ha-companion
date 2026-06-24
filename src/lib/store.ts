@@ -5,8 +5,9 @@ export interface EntityCard {
   entity_id: string;
   name: string;
   icon: string; // "mdi:name" | data/http image url | emoji
-  service: string; // toggle | turn_on | turn_off | trigger | press ...
+  service: string;
   color?: string; // optional per-tile accent override (hex)
+  size?: "s" | "l"; // tile size (small = half width, large = full width)
 }
 
 export type ThemeMode = "dark" | "light";
@@ -16,13 +17,14 @@ export type Lang = "en" | "ru";
 
 export interface ThemeConfig {
   accent: string;
-  opacity: number; // panel translucency (0..1)
+  opacity: number;
   mode: ThemeMode;
-  radius: number; // px corner radius for tiles/elements
+  radius: number;
   columns: 1 | 2;
   animations: boolean;
   panelSize: PanelSize;
   backdrop: Backdrop;
+  performance: boolean;
 }
 
 export interface AppConfig {
@@ -38,10 +40,11 @@ export const DEFAULT_THEME: ThemeConfig = {
   opacity: 0.6,
   mode: "dark",
   radius: 16,
-  columns: 1,
+  columns: 2,
   animations: true,
   panelSize: "m",
   backdrop: "mica",
+  performance: false,
 };
 
 const DEFAULT_CONFIG: AppConfig = {
@@ -59,6 +62,7 @@ export const PANEL_SIZES: Record<PanelSize, { w: number; h: number }> = {
 };
 
 const STORAGE_KEY = "ha-companion-config";
+export const STATES_KEY = "ha-companion-states";
 
 export function loadConfig(): AppConfig {
   try {
@@ -78,6 +82,14 @@ export function loadConfig(): AppConfig {
   return DEFAULT_CONFIG;
 }
 
+function loadStates(): Record<string, any> {
+  try {
+    const raw = localStorage.getItem(STATES_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {};
+}
+
 export const config = writable<AppConfig>(loadConfig());
 
 config.subscribe((c) => {
@@ -88,8 +100,8 @@ config.subscribe((c) => {
   }
 });
 
-/** Live entity states from HA, keyed by entity_id. */
-export const entities = writable<Record<string, any>>({});
+/** Live entity states from HA, keyed by entity_id (seeded from last session). */
+export const entities = writable<Record<string, any>>(loadStates());
 
 export type ConnStatus = "disconnected" | "connecting" | "connected" | "error";
 export const connStatus = writable<ConnStatus>("disconnected");

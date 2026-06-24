@@ -7,6 +7,7 @@
   import Icon from "./Icon.svelte";
 
   export let card: EntityCard;
+  export let compact = false;
 
   $: ent = $entities[card.entity_id];
   $: domain = card.entity_id.split(".")[0];
@@ -59,7 +60,7 @@
   }
 
   function stateLabel(): string {
-    if (unavailable) return $t("tile.unavailable");
+    if (unavailable) return "";
     if (isReadonly) {
       const unit = attrs.unit_of_measurement ? ` ${attrs.unit_of_measurement}` : "";
       return `${state}${unit}`;
@@ -69,10 +70,13 @@
     if (state === "off") return $t("tile.off");
     return state;
   }
+  $: label = stateLabel();
+  $: void [$t, state, bri, unavailable, isReadonly, isAction, canBright, attrs];
 </script>
 
 <div
   class="tile"
+  class:compact
   class:on={state === "on" && !isAction && !isReadonly}
   class:action={isAction}
   class:readonly={isReadonly}
@@ -85,7 +89,7 @@
       <span class="icon"><Icon icon={card.icon} size={22} /></span>
       <span class="meta">
         <span class="name">{card.name}</span>
-        <span class="state">{stateLabel()}</span>
+        {#if label}<span class="state">{label}</span>{/if}
       </span>
     </button>
 
@@ -156,6 +160,13 @@
     color: var(--text);
     cursor: pointer;
     text-align: left;
+  }
+  .tile.compact .hit {
+    gap: 9px;
+    padding: 10px 0 10px 11px;
+  }
+  .tile.compact .name {
+    font-size: 12.5px;
   }
   .tile.unavailable .hit,
   .tile.readonly .hit {
