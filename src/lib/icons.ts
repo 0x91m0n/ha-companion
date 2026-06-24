@@ -17,6 +17,12 @@ export const DOMAIN_MDI: Record<string, string> = {
   vacuum: "mdi:robot-vacuum",
   humidifier: "mdi:air-humidifier",
   siren: "mdi:bullhorn",
+  sensor: "mdi:gauge",
+  binary_sensor: "mdi:checkbox-marked-circle-outline",
+  weather: "mdi:weather-partly-cloudy",
+  person: "mdi:account",
+  device_tracker: "mdi:map-marker",
+  sun: "mdi:white-balance-sunny",
 };
 
 export function iconForDomain(domain: string): string {
@@ -51,12 +57,25 @@ export const CONTROLLABLE_DOMAINS = [
   "button",
   "lock",
   "vacuum",
+  "sensor",
+  "binary_sensor",
 ];
+
+/** Read-only domains shown as info tiles (no service call on click). */
+export const READONLY_DOMAINS = new Set([
+  "sensor",
+  "binary_sensor",
+  "weather",
+  "person",
+  "device_tracker",
+  "sun",
+]);
 
 /** Momentary-action domains rather than on/off toggles. */
 export const ACTION_DOMAINS = new Set(["scene", "script", "automation", "button"]);
 
 export function defaultService(domain: string): string {
+  if (READONLY_DOMAINS.has(domain)) return "";
   switch (domain) {
     case "scene":
     case "script":

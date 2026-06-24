@@ -1,9 +1,11 @@
 <script lang="ts">
   import { config, connStatus, lastError } from "../store";
   import { t } from "../i18n";
+  import { turnOffAllLights } from "../haClient";
   import EntityTile from "./EntityTile.svelte";
   import AddTile from "./AddTile.svelte";
   import { openSettings, openFullHA } from "../windows";
+  import { invoke } from "@tauri-apps/api/core";
 
   const statusKey: Record<string, string> = {
     connected: "status.connected",
@@ -11,6 +13,19 @@
     error: "status.error",
     disconnected: "status.disconnected",
   };
+
+  let pinned = false;
+  function togglePin() {
+    pinned = !pinned;
+    invoke("set_pinned", { value: pinned }).catch((e) => console.warn(e));
+  }
+
+  $: lightIds = $config.cards
+    .filter((c) => c.entity_id.startsWith("light."))
+    .map((c) => c.entity_id);
+  function allOff() {
+    turnOffAllLights(lightIds);
+  }
 </script>
 
 <div class="panel">
@@ -19,12 +34,19 @@
       <span class="dot {$connStatus}"></span>
       <span>Home Assistant</span>
     </div>
-    <button class="icon-btn" on:click={() => openSettings()} title="Settings">
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-      </svg>
-    </button>
+    <div class="actions">
+      {#if lightIds.length}
+        <button class="icon-btn" on:click={allOff} title={$t("panel.allOff")}>
+          <i class="mdi mdi-power"></i>
+        </button>
+      {/if}
+      <button class="icon-btn" class:active={pinned} on:click={togglePin} title={pinned ? $t("panel.unpin") : $t("panel.pin")}>
+        <i class="mdi {pinned ? 'mdi-pin' : 'mdi-pin-outline'}"></i>
+      </button>
+      <button class="icon-btn gear" on:click={() => openSettings()} title="Settings">
+        <i class="mdi mdi-cog-outline"></i>
+      </button>
+    </div>
   </header>
 
   <p class="status" class:err={$connStatus === "error"}>
@@ -78,6 +100,11 @@
     font-size: 15px;
     letter-spacing: -0.01em;
   }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
   .dot {
     width: 9px;
     height: 9px;
@@ -111,14 +138,23 @@
     background: transparent;
     border: none;
     color: var(--text);
-    opacity: 0.8;
+    opacity: 0.75;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s, transform 0.3s;
+    transition: background 0.2s, opacity 0.2s, color 0.2s;
+  }
+  .icon-btn i {
+    font-size: 18px;
   }
   .icon-btn:hover {
     background: var(--surface-hover);
     opacity: 1;
+  }
+  .icon-btn.gear:hover {
     transform: rotate(40deg);
+  }
+  .icon-btn.active {
+    color: var(--accent);
+    opacity: 1;
   }
   .status {
     margin: -4px 9px 0 0;

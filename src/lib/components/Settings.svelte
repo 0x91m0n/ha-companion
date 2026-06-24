@@ -108,6 +108,9 @@
   function setIcon(i: number, icon: string) {
     cards = cards.map((c, idx) => (idx === i ? { ...c, icon } : c));
   }
+  function setCardColor(i: number, color: string | undefined) {
+    cards = cards.map((c, idx) => (idx === i ? { ...c, color } : c));
+  }
   function openIconEditor(id: string) {
     editingIcon = editingIcon === id ? null : id;
     iconTab = "mdi";
@@ -290,6 +293,13 @@
                         {#each EMOJI_PALETTE as em}<button on:click={() => setIcon(i, em)}>{em}</button>{/each}
                       </div>
                     {/if}
+                    <div class="pop-color">
+                      <span class="pc-lbl">{$t("ent.tileColor")}</span>
+                      <label class="pc-swatch" style="background: {card.color || 'var(--accent)'}">
+                        <input type="color" value={card.color || "#5b8cff"} on:input={(e) => setCardColor(i, (e.target as HTMLInputElement).value)} />
+                      </label>
+                      {#if card.color}<button class="pc-reset" on:click={() => setCardColor(i, undefined)}>{$t("reset")}</button>{/if}
+                    </div>
                   </div>
                 {/if}
               </div>
@@ -372,7 +382,7 @@
           <input type="range" min="0" max="28" step="1" bind:value={radius} /></label>
 
         <label class="field"><span>{$t("appr.opacity")}: {Math.round(opacity * 100)}%</span>
-          <input type="range" min="0.25" max="0.98" step="0.02" bind:value={opacity} /></label>
+          <input type="range" min="0.1" max="1" step="0.02" bind:value={opacity} /></label>
 
         <div class="field"><span>{$t("appr.backdrop")}</span>
           <div class="seg">
@@ -796,6 +806,44 @@
   }
   .emoji-grid button:hover {
     background: var(--surface-hover);
+  }
+  .pop-color {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .pc-lbl {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex: 1;
+  }
+  .pc-swatch {
+    position: relative;
+    width: 30px;
+    height: 24px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .pc-swatch input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .pc-reset {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
   }
   .picker {
     background: var(--input-bg);

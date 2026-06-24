@@ -70,9 +70,16 @@ export async function callEntityService(card: EntityCard): Promise<void> {
   if (!connection) return;
   const domain = card.entity_id.split(".")[0];
   const service = card.service || defaultService(domain);
+  if (!service) return; // read-only entity
   await callService(connection, domain, service, undefined, {
     entity_id: card.entity_id,
   });
+}
+
+/** Turn off all given light entities at once. */
+export async function turnOffAllLights(entity_ids: string[]): Promise<void> {
+  if (!connection || entity_ids.length === 0) return;
+  await callService(connection, "light", "turn_off", undefined, { entity_id: entity_ids });
 }
 
 export async function setBrightness(entity_id: string, pct: number): Promise<void> {

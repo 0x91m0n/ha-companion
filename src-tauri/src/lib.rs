@@ -1,3 +1,4 @@
+use std::sync::Mutex;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -6,10 +7,12 @@ use tauri::{
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 #[cfg(target_os = "windows")]
-use window_vibrancy::{apply_acrylic, apply_mica};
+use window_vibrancy::{apply_acrylic, apply_mica, clear_acrylic, clear_blur, clear_mica};
 
-/// Round the window's corners natively on Windows 11 (avoids the
-/// "rounded-over-square" artifact from CSS-only rounding on transparent windows).
+/// Whether the panel is "pinned" (do not auto-hide on blur).
+struct Pinned(Mutex<bool>);
+
+/// Round the window's corners natively on Windows 11.
 #[cfg(target_os = "windows")]
 fn round_corners(window: &tauri::WebviewWindow) {
     use windows_sys::Win32::Graphics::Dwm::DwmSetWindowAttribute;
@@ -30,13 +33,21 @@ fn round_corners(window: &tauri::WebviewWindow) {
 }
 
 /// Apply the chosen native backdrop to the panel window.
+/// Clears any previous effect first so switching types works live.
 #[tauri::command]
-fn apply_backdrop(window: tauri::WebviewWindow, kind: String, dark: bool) {
+fn apply_backdrop(window: tauri::WebviewWindow, kind: String, dark: bool, alpha: u8) {
     #[cfg(target_os = "windows")]
     {
+        let _ = clear_mica(&window);
+        let _ = clear_acrylic(&window);
+        let _ = clear_blur(&window);
         match kind.as_str() {
             "acrylic" => {
-                let tint = if dark { (24, 26, 34, 140) } else { (245, 246, 250, 150) };
+                let tint = if dark {
+                    (20, 22, 30, alpha)
+                } else {
+                    (245, 246, 250, alpha)
+                };
                 let _ = apply_acrylic(&window, Some(tint));
             }
             "solid" => { /* CSS provides the solid background */ }
@@ -48,7 +59,15 @@ fn apply_backdrop(window: tauri::WebviewWindow, kind: String, dark: bool) {
     }
     #[cfg(not(target_os = "windows"))]
     {
-        let _ = (window, kind, dark);
+        let _ = (window, kind, dark, alpha);
+    }
+}
+
+/// Toggle the panel's "pinned" state (kept open even when it loses focus).
+#[tauri::command]
+fn set_pinned(state: tauri::State<Pinned>, value: bool) {
+    if let Ok(mut g) = state.0.lock() {
+        *g = value;
     }
 }
 
@@ -136,6 +155,7 @@ fn toggle_panel(app: &AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(Pinned(Mutex::new(false)))
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, _shortcut, event| {
@@ -149,10 +169,19 @@ pub fn run() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
+        // Auto-hide the panel on blur, unless it is pinned.
         .on_window_event(|window, event| {
             if window.label() == "panel" {
                 if let WindowEvent::Focused(false) = event {
-                    let _ = window.hide();
+                    let pinned = window
+                        .state::<Pinned>()
+                        .0
+                        .lock()
+                        .map(|g| *g)
+                        .unwrap_or(false);
+                    if !pinned {
+                        let _ = window.hide();
+                    }
                 }
             }
         })
@@ -199,7 +228,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![apply_backdrop])
+        .invoke_handler(tauri::generate_handler![apply_backdrop, set_pinned])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

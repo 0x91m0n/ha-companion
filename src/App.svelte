@@ -26,7 +26,11 @@
   async function applyPanelChrome(c: AppConfig) {
     if (isSettings) return;
     try {
-      await invoke("apply_backdrop", { kind: c.theme.backdrop, dark: c.theme.mode === "dark" });
+      await invoke("apply_backdrop", {
+        kind: c.theme.backdrop,
+        dark: c.theme.mode === "dark",
+        alpha: Math.round(Math.min(1, Math.max(0, c.theme.opacity)) * 255),
+      });
     } catch (e) {
       console.warn("apply_backdrop failed", e);
     }
@@ -43,7 +47,6 @@
     config.set(next);
     applyTheme(next.theme);
     locale.set(next.lang ?? "en");
-    applyPanelChrome(next);
   }
 
   onMount(() => {

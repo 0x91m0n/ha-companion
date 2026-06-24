@@ -1,7 +1,7 @@
 <script lang="ts">
   import { entities } from "../store";
   import { callEntityService, setBrightness, setLightColor } from "../haClient";
-  import { ACTION_DOMAINS } from "../icons";
+  import { ACTION_DOMAINS, READONLY_DOMAINS } from "../icons";
   import { t } from "../i18n";
   import type { EntityCard } from "../store";
   import Icon from "./Icon.svelte";
@@ -11,6 +11,7 @@
   $: ent = $entities[card.entity_id];
   $: domain = card.entity_id.split(".")[0];
   $: isAction = ACTION_DOMAINS.has(domain);
+  $: isReadonly = READONLY_DOMAINS.has(domain);
   $: state = ent?.state ?? "unavailable";
   $: unavailable = !ent || state === "unavailable" || state === "unknown";
   $: attrs = ent?.attributes ?? {};
@@ -18,7 +19,7 @@
   $: canColor = domain === "light" && modes.some((m) => ["rgb", "rgbw", "rgbww", "hs", "xy"].includes(m));
   $: canBright =
     domain === "light" && (canColor || modes.includes("brightness") || attrs.brightness != null);
-  $: expandable = !isAction && canColor;
+  $: expandable = !isAction && !isReadonly && canColor;
   $: rgb = attrs.rgb_color as number[] | undefined;
   $: tileAccent = card.color || (state === "on" && rgb ? `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})` : "var(--accent)");
 
@@ -40,7 +41,7 @@
   }
 
   function activate() {
-    if (unavailable) return;
+    if (unavailable || isReadonly) return;
     if (isAction) {
       flash = true;
       setTimeout(() => (flash = false), 450);
@@ -59,6 +60,10 @@
 
   function stateLabel(): string {
     if (unavailable) return $t("tile.unavailable");
+    if (isReadonly) {
+      const unit = attrs.unit_of_measurement ? ` ${attrs.unit_of_measurement}` : "";
+      return `${state}${unit}`;
+    }
     if (isAction) return $t("tile.press");
     if (state === "on") return canBright ? `${bri}%` : $t("tile.on");
     if (state === "off") return $t("tile.off");
@@ -68,8 +73,9 @@
 
 <div
   class="tile"
-  class:on={state === "on" && !isAction}
+  class:on={state === "on" && !isAction && !isReadonly}
   class:action={isAction}
+  class:readonly={isReadonly}
   class:unavailable
   class:flash
   style="--glow: {tileAccent}"
@@ -83,7 +89,7 @@
       </span>
     </button>
 
-    {#if !isAction}
+    {#if !isAction && !isReadonly}
       <span class="led" class:lit={state === "on"}></span>
     {/if}
     {#if expandable && state === "on"}
@@ -99,7 +105,7 @@
 
   {#if expandable && expanded && state === "on"}
     <div class="drawer">
-      <label class="palette" style="--c: {colorHex}">
+      <label class="palette">
         <span class="ring"></span>
         <span class="plbl">{$t("tile.color")}</span>
         <span class="cur" style="background: {colorHex}"></span>
@@ -151,8 +157,9 @@
     cursor: pointer;
     text-align: left;
   }
-  .tile.unavailable .hit {
-    cursor: not-allowed;
+  .tile.unavailable .hit,
+  .tile.readonly .hit {
+    cursor: default;
   }
   .icon {
     display: grid;
