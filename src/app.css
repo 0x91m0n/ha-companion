@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #5b8cff;
+  --radius: 16px;
+  --bg-opacity: 0.6;
+  --cols: 1;
+  --text: #f3f5fa;
+  --text-muted: #868ca0;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.09);
+  --border: rgba(255, 255, 255, 0.1);
+  --window-bg: #11131b;
+  --rail-bg: #0c0e15;
+  --input-bg: #0c0e15;
+  --panel-g1: rgba(34, 37, 50, var(--bg-opacity));
+  --panel-g2: rgba(18, 20, 28, calc(var(--bg-opacity) + 0.08));
+}
+
+html.theme-light {
+  --text: #1a1d26;
+  --text-muted: #5a6072;
+  --surface: rgba(0, 0, 0, 0.045);
+  --surface-hover: rgba(0, 0, 0, 0.09);
+  --border: rgba(0, 0, 0, 0.12);
+  --window-bg: #f4f6fa;
+  --rail-bg: #e8ecf3;
+  --input-bg: #ffffff;
+  --panel-g1: rgba(255, 255, 255, var(--bg-opacity));
+  --panel-g2: rgba(230, 235, 244, calc(var(--bg-opacity) + 0.08));
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Quick panel: transparent so native Mica/Acrylic shows through */
+html.ctx-panel,
+html.ctx-panel body,
+html.ctx-panel #app {
+  background: transparent;
+  overflow: hidden;
+}
+
+/* Settings window: solid surface */
+html.ctx-window,
+html.ctx-window body,
+html.ctx-window #app {
+  background: var(--window-bg);
+  overflow: hidden;
+}
+
+/* Disable motion when animations are turned off */
+.no-anim *,
+.no-anim *::before,
+.no-anim *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.35);
+  border-radius: 8px;
+}
+html.ctx-panel ::-webkit-scrollbar {
+  width: 0;
+}
+
+input,
+button,
+textarea {
+  font-family: inherit;
+}
