@@ -1,9 +1,11 @@
 **HA Companion** is a lightweight desktop application for managing a Home Assistant smart home system directly from the Windows taskbar.
 
 The application resides in the system tray and opens the control panel via a mouse click or a keyboard shortcut.
+
 <p align="center">
   <video src="demo.mp4" width="70%" autoplay loop muted playsinline></video>
 </p>
+
 ## Features
 
 * **Convenient Access**: The panel appears above the tray icon upon a left-click. It automatically hides when it loses focus (clicking anywhere else on the screen).
