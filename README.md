@@ -22,4 +22,4 @@ The application resides in the system tray and opens the control panel via a mou
 
 ## Known Bugs
 
-* **Sensor Updates**: In the current version, some sensor values may fail to update automatically in real-time. A panel restart or reconnection is required to sync the state.
+* **Sensor Updates**: Some sensor values fail to update automatically in real-time.
