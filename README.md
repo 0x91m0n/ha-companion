@@ -30,3 +30,7 @@ The application resides in the system tray and opens the control panel via a mou
 ## Known Bugs
 
 * **Sensor Updates**: Some sensor values fail to update automatically in real-time.
+
+## Disclaimer
+
+This project was originally developed for personal use and is currently in an early, experimental state. It was built using vibe code, so expect a lot of weird and unexpected bugs. It is shared strictly as-is in case anyone finds the concept useful. Feel free to explore, fork, or contribute to help improve it.
