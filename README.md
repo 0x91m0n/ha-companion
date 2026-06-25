@@ -2,7 +2,7 @@
 
 The application resides in the system tray and opens the control panel via a mouse click or a keyboard shortcut.
 <p align="center">
-  <video src="./assets/demo.mp4" width="70%" autoplay loop muted playsinline></video>
+  <video src="demo.mp4" width="70%" autoplay loop muted playsinline></video>
 </p>
 ## Features
 
