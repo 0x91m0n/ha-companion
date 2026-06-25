@@ -19,3 +19,7 @@ The application resides in the system tray and opens the control panel via a mou
    * **URL**: The address of your Home Assistant server (e.g., `http://192.168.1.100:8123`).
    * **Token**: Long-Lived Access Token. To generate it, open Home Assistant, go to your profile (bottom left corner) -> "Security" tab -> scroll down to the bottom and click "Create Token".
 4. Click "Save".
+
+## Known Bugs
+
+* **Sensor Updates**: In the current version, some sensor values may fail to update automatically in real-time. A panel restart or reconnection is required to sync the state.
