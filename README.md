@@ -3,7 +3,8 @@
 The application resides in the system tray and opens the control panel via a mouse click or a keyboard shortcut.
 
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/bc0c0f64-858b-4690-a335-53778f72ae0b" width="75%" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" autoplay loop muted playsinline></video>
+  <img src="https://github.com/user-attachments/assets/bc0c0f64-858b-4690-a335-53778f72ae0b
+" width="75%">
 </p>
 
 ## Features
