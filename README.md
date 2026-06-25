@@ -2,7 +2,11 @@
 
 The application resides in the system tray and opens the control panel via a mouse click or a keyboard shortcut.
 
-![](demo.mp4)
+
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/bc0c0f64-858b-4690-a335-53778f72ae0b" width="70%" autoplay loop muted playsinline></video>
+</p>
+
 
 ## Features
 
