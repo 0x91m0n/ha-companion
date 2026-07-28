@@ -1,6 +1,7 @@
 # dependencies
 node_modules/
 BUILD.md
+README.md
 
 # build output
 dist/
