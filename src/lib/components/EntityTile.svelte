@@ -59,19 +59,23 @@
     setLightColor(card.entity_id, hexToRgb(colorHex));
   }
 
-  function stateLabel(): string {
-    if (unavailable) return "";
-    if (isReadonly) {
-      const unit = attrs.unit_of_measurement ? ` ${attrs.unit_of_measurement}` : "";
-      return `${state}${unit}`;
-    }
-    if (isAction) return $t("tile.press");
-    if (state === "on") return canBright ? `${bri}%` : $t("tile.on");
-    if (state === "off") return $t("tile.off");
-    return state;
-  }
-  $: label = stateLabel();
-  $: void [$t, state, bri, unavailable, isReadonly, isAction, canBright, attrs];
+  $: unit = attrs.unit_of_measurement ? ` ${attrs.unit_of_measurement}` : "";
+  // Reactive label — depends directly on state/attrs so it updates live.
+  $: label = unavailable
+    ? isReadonly
+      ? "—"
+      : ""
+    : isReadonly
+      ? `${state}${unit}`
+      : isAction
+        ? $t("tile.press")
+        : state === "on"
+          ? canBright
+            ? `${bri}%`
+            : $t("tile.on")
+          : state === "off"
+            ? $t("tile.off")
+            : state;
 </script>
 
 <div

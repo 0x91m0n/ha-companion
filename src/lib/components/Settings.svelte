@@ -267,6 +267,16 @@
                   <input class="name-input" bind:value={card.name} />
                   <span class="eid">{card.entity_id}</span>
                 </div>
+                <div class="seg seg-sm row-size" title={$t("ent.tileSize")}>
+                  <button class:active={effSize(card) === "s"} on:click={() => setCardSize(i, "s")} title={$t("size.small")}>S</button>
+                  <button class:active={effSize(card) === "l"} on:click={() => setCardSize(i, "l")} title={$t("size.large")}>L</button>
+                </div>
+                <label class="row-color" style="background: {card.color || 'var(--accent)'}" title={$t("ent.tileColor")}>
+                  <input type="color" value={card.color || "#5b8cff"} on:input={(e) => setCardColor(i, (e.target as HTMLInputElement).value)} />
+                </label>
+                {#if card.color}
+                  <button class="row-color-reset" on:click={() => setCardColor(i, undefined)} title={$t("reset")}>↺</button>
+                {/if}
                 <div class="card-actions">
                   <button class="mini" on:click={() => move(i, -1)} disabled={i === 0}>↑</button>
                   <button class="mini" on:click={() => move(i, 1)} disabled={i === cards.length - 1}>↓</button>
@@ -301,20 +311,6 @@
                         {#each EMOJI_PALETTE as em}<button on:click={() => setIcon(i, em)}>{em}</button>{/each}
                       </div>
                     {/if}
-                    <div class="pop-color">
-                      <span class="pc-lbl">{$t("ent.tileColor")}</span>
-                      <label class="pc-swatch" style="background: {card.color || 'var(--accent)'}">
-                        <input type="color" value={card.color || "#5b8cff"} on:input={(e) => setCardColor(i, (e.target as HTMLInputElement).value)} />
-                      </label>
-                      {#if card.color}<button class="pc-reset" on:click={() => setCardColor(i, undefined)}>{$t("reset")}</button>{/if}
-                    </div>
-                    <div class="pop-color">
-                      <span class="pc-lbl">{$t("ent.tileSize")}</span>
-                      <div class="seg seg-sm">
-                        <button class:active={effSize(card) === "s"} on:click={() => setCardSize(i, "s")}>{$t("size.small")}</button>
-                        <button class:active={effSize(card) === "l"} on:click={() => setCardSize(i, "l")}>{$t("size.large")}</button>
-                      </div>
-                    </div>
                   </div>
                 {/if}
               </div>
@@ -375,13 +371,6 @@
             <div class="swatches">
               {#each ACCENTS as c}<button style="background:{c}" on:click={() => (accent = c)} aria-label={c}></button>{/each}
             </div>
-          </div>
-        </div>
-
-        <div class="field"><span>{$t("appr.layout")}</span>
-          <div class="seg">
-            <button class:active={columns === 1} on:click={() => (columns = 1)}>{$t("appr.col1")}</button>
-            <button class:active={columns === 2} on:click={() => (columns = 2)}>{$t("appr.col2")}</button>
           </div>
         </div>
 
@@ -829,47 +818,41 @@
   .emoji-grid button:hover {
     background: var(--surface-hover);
   }
-  .pop-color {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
+  .seg-sm button {
+    padding: 5px 11px;
+    font-size: 11px;
   }
-  .pc-lbl {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    flex: 1;
+  .row-size {
+    flex-shrink: 0;
   }
-  .pc-swatch {
+  .row-color {
     position: relative;
-    width: 30px;
-    height: 24px;
-    border-radius: 7px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     border: 1px solid var(--border);
     cursor: pointer;
     overflow: hidden;
+    flex-shrink: 0;
   }
-  .pc-swatch input {
+  .row-color input {
     position: absolute;
     inset: 0;
     opacity: 0;
     cursor: pointer;
   }
-  .pc-reset {
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 11px;
+  .row-color-reset {
+    width: 24px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
     cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
   }
-  .seg-sm button {
-    padding: 5px 11px;
-    font-size: 11px;
+  .row-color-reset:hover {
+    color: var(--text);
   }
   .picker {
     background: var(--input-bg);

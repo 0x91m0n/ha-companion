@@ -18,9 +18,7 @@
   function tileSize(c: { entity_id: string; size?: "s" | "l" }): "s" | "l" {
     return c.size ?? (READONLY_DOMAINS.has(c.entity_id.split(".")[0]) ? "s" : "l");
   }
-  $: cols = $config.theme.columns;
   function span(c: { entity_id: string; size?: "s" | "l" }): number {
-    if (cols < 2) return 1;
     return tileSize(c) === "l" ? 2 : 1;
   }
 
@@ -71,10 +69,10 @@
         <AddTile />
       </div>
     {:else}
-      <div class="grid" style="--gtc: repeat(var(--cols, 1), 1fr)">
+      <div class="grid" style="--gtc: repeat(2, 1fr)">
         {#each $config.cards as card (card.entity_id)}
           <div class="cell" style="grid-column: span {span(card)}">
-            <EntityTile {card} compact={cols >= 2 && span(card) === 1} />
+            <EntityTile {card} compact={span(card) === 1} />
           </div>
         {/each}
       </div>

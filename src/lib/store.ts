@@ -62,7 +62,6 @@ export const PANEL_SIZES: Record<PanelSize, { w: number; h: number }> = {
 };
 
 const STORAGE_KEY = "ha-companion-config";
-export const STATES_KEY = "ha-companion-states";
 
 export function loadConfig(): AppConfig {
   try {
@@ -83,10 +82,6 @@ export function loadConfig(): AppConfig {
 }
 
 function loadStates(): Record<string, any> {
-  try {
-    const raw = localStorage.getItem(STATES_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
   return {};
 }
 
@@ -100,7 +95,7 @@ config.subscribe((c) => {
   }
 });
 
-/** Live entity states from HA, keyed by entity_id (seeded from last session). */
+/** Live entity states from HA, keyed by entity_id. */
 export const entities = writable<Record<string, any>>(loadStates());
 
 export type ConnStatus = "disconnected" | "connecting" | "connected" | "error";
