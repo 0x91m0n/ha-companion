@@ -1,7 +1,7 @@
 # dependencies
 node_modules/
 BUILD.md
-README.md
+1README.md
 
 # build output
 dist/
